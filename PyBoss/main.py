@@ -1,9 +1,12 @@
 # main.py for PyBoss
 
 import csv
+import os
 
-csvpath1 = 'employee_data1.csv'
-#csvpath2 = 'employee_data2.csv'
+#Need to update csv file name below, which I don't consider a "major re-write".
+emp_data_csv = 'employee_data2.csv'
+
+cleaned_emp_data_csv = os.path.join('cleaned_' + emp_data_csv)
 
 employee_id = []
 first_name = []
@@ -65,34 +68,37 @@ us_state_abbrev = {
     'Wyoming': 'WY',
 }
 
-with open(csvpath1, newline='') as csvfile:
+with open(emp_data_csv, newline='') as csvfile:
 
     csvreader = csv.reader(csvfile, delimiter=',')
+    
+    # Skip headers
+    next(csvreader)
 
     for row in csvreader:
 
         employee_id.append(row[0])
 
         name = row[1].split(" ")
-        first_name = name.append(name[0])
-        last_name = name.append(name[1])
+        first_name.append(name[0])
+        last_name.append(name[1])
 
-        new_dob = row[2].split("-")
-        dob.append(new_dob[1]+"/"+new_dob[2]+"/"+new_dob[0]
+        split_dob = row[2].split("-")
+        dob.append(split_dob[1] + "/" + split_dob[2] + "/" + split_dob[0])
 
         new_ssn = row[3].split("-")
-        ssn.append("***-**"+new_ssn[2])
+        ssn.append("***-**-"+new_ssn[2])
 
-        state = us_state_abbrev[row[4]]
+        abbrev = us_state_abbrev[row[4]]
+        state.append(abbrev)
+       
+cleaned_data = zip(employee_id, first_name, last_name, dob, ssn, state)
 
-cleaned_csv = zip(employee_id, first_name, last_name, dob, ssn, state)
-print(cleaned_csv)
+with open(cleaned_emp_data_csv, 'w', newline='') as csvfile:
 
+    csvwriter = csv.writer(csvfile, delimiter=',')
 
-#make this work for 2 files... and keep going. And copy in the csv files to local directory
-
-#look at web_solved.py?
-
-#TODO: export to csv
-
-
+    csvwriter.writerow(['Emp ID', 'First Name', 'Last Name', 'DOB', 'SSN', 'State'])
+    
+    for row in cleaned_data:
+        csvwriter.writerow(row)
